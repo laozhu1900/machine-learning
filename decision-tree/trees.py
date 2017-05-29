@@ -94,7 +94,7 @@ def majorityCnt(classList):
 
 def createTree(dataSet, labels):
     classList = [example[-1] for example in dataSet]
-    
+
     # 类别完全相同则停止划分
     if classList.count(classList[0]) == len(classList):
         return classList[0]
@@ -102,6 +102,7 @@ def createTree(dataSet, labels):
     # 遍历完所有的特征时返回出现次数最多的 
     if len(dataSet[0]) == 1:
         return majorityCnt(classList)
+
     bestFeat = chooseBestFeatureToSplit(dataSet)
     bestFeatLabel = labels[bestFeat]
     myTree = {bestFeatLabel:{}}
@@ -112,9 +113,17 @@ def createTree(dataSet, labels):
     uniqueVals = set(featValues)
     for value in uniqueVals:
         subLables = labels[:]
+        subDataset = splitDataSet(dataSet,bestFeat,value)
+        """
+            value 可能为0或者1
+            value = 0 : =>  {'no surfacing': {0: 'no'}
+            value =1 : => {'no surfacing': {0: 'no', 1:{createTree}}} => createTree递归，算出 {'flippers': {0: 'no', 1: 'yes'}
+            最后结果: {'no surfacing': {0: 'no', 1: {'flippers': {0: 'no', 1: 'yes'}}}}
+        """
         myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet,bestFeat,value),subLables)
-    return myTree
 
+    return myTree
+    
 
 if __name__ == '__main__':
     myDat, labels = createDataSet()
