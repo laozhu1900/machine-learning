@@ -2,6 +2,8 @@
 #-*-coding:utf-8-*-
 from math import log
 import operator
+from treePlotter import *
+import pickle
 
 """
     香农公式的用途：
@@ -123,12 +125,36 @@ def createTree(dataSet, labels):
         myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet,bestFeat,value),subLables)
 
     return myTree
-    
+
+def classify(inputTree, featLabels,testVec):
+    firstStr = inputTree.keys()[0]
+    secondDict = inputTree[firstStr]
+
+    featIndex = featLabels.index(firstStr)
+    for key in secondDict.keys():
+        if testVec[featIndex] == key:
+            if type(secondDict[key]).__name__ == 'dict':
+                classLabel = classify(secondDict[key], featLabels, testVec)
+            else:
+                classLabel = secondDict[key]
+    return classLabel
+
+
+# 使用pickle模块存储决策树
+def storeTree(inputTree, filename):
+    fw = open(filename,'w')
+    pickle.dump(inputTree,fw)
+    fw.close()
+
+def grabTree(filename):
+    fr = open(filename)
+    return pickle.load(fr)
+
 
 if __name__ == '__main__':
     myDat, labels = createDataSet()
     print myDat
- 
+
     # print calcShannonEnt(myDat)
     # myDat[0][-1] = 'maybe'
     # print myDat
@@ -139,7 +165,22 @@ if __name__ == '__main__':
     # print splitDataSet(myDat,0, 0)
     print chooseBestFeatureToSplit(myDat)
     print "----------------"
-
-    myTree = createTree(myDat, labels)
+    myTree = retrieveTree(0)
+    # myTree = createTree(myDat, labels)
     print myTree
+    print labels
+    print classify(myTree, labels, [1,0])
+    storeTree(myTree,'classifierStoreage.txt')
+    print grabTree('classifierStoreage.txt')
+
+    print '--------demo----------'
+    """
+        demo: 使用决策树预测隐形眼镜的类型
+    """
+    fr = open('lenses.txt')
+    lenses = [inst.strip().split('\t') for inst in fr.readlines()]
+    lensesLabels = ['age', 'prescript','astigmatic','tearRate']
+    lensesTree = createTree(lenses, lensesLabels)
+    print lensesTree
+    print createPlot(lensesTree)
 
