@@ -39,6 +39,7 @@ def createPlot(inTree):
     plotTree.xOff = -0.5/plotTree.totalW; plotTree.yOff = 1.0;
     plotTree(inTree, (0.5,1.0), '')
     plt.show()
+
 # def createPlot():
 # 	fig = plt.figure(1, facecolor='white')
 # 	fig.clf()
