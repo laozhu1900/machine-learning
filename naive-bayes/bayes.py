@@ -51,6 +51,7 @@ def trainNB0(trainMatrix, trainCategory):
 
 	# p0Num = zeros(numWords);p1Num = zeros(numWords)
 	# p0Denom = 0.0; p1Denom = 0.0
+	# ones 方法是生成一维矩阵
 	p0Num = ones(numWords); p1Num = ones(numWords)
 	p0Denom = 2.0; p1Denom = 2.0
 	for i in range(numTrainDocs):
@@ -74,6 +75,9 @@ def trainNB0(trainMatrix, trainCategory):
 
 def classifyNB(vec2Classify, p0Vect, p1Vect, pClass1):
 	# 元素相乘
+	print 111, vec2Classify
+	print 222, p1Vect
+	print 3333, vec2Classify * p1Vect
 	p1 = sum(vec2Classify * p1Vect) + log(pClass1)
 	p0 = sum(vec2Classify * p0Vect) + log(1.0 - pClass1)
 	if p1 > p0:
@@ -95,11 +99,13 @@ def testingNB():
 	thisDoc = array(setOfWords2Vec(myVocabList, testEntry))
 	print testEntry, 'classified as: ', classifyNB(thisDoc, p0V, p1V, pAb)
 
-#  测试算法
+#  文件解析和完整的测试函数
 def textParse(bigString):
 	listOfTokens = re.split(r'\W*', bigString)
+	# 只返回长度大于2的单词
 	return [tok.lower() for tok in listOfTokens if len(tok) > 2]
 def spamTest():
+	# 文档的样本，分类样本，全部样本
 	docList = []; classList = []; fullText = []
 	for i in range(1,26):
 		wordList = textParse(open('email/spam/%d.txt' % i).read())
@@ -110,19 +116,32 @@ def spamTest():
 		docList.append(wordList)
 		fullText.extend(wordList)
 		classList.append(0)
+
+    # 对这些单词创建向量
 	vocabList = createVocabList(docList)
+
+   # 这里取50的是因为：len(docList)=50, len(classList)=50
 	trainingSet = range(50); testSet = []
 
 	# 随机构建训练集
 	for i in range(10):
 		randIndex = int(random.uniform(0, len(trainingSet)))
+		print randIndex
 		testSet.append(trainingSet[randIndex])
 		del(trainingSet[randIndex])
+	print testSet
+	print trainingSet
 	trainMat = []; trainClass = []
 	for docIndex in trainingSet:
 		trainMat.append(setOfWords2Vec(vocabList, docList[docIndex]))
+		print len(setOfWords2Vec(vocabList, docList[docIndex]))
 		trainClass.append(classList[docIndex])
 	p0V, p1V, pSpam = trainNB0(array(trainMat), array(trainClass))
+	print array(trainMat)
+	print array(trainClass)
+	print p0V
+	print p1V
+	print pSpam
 	errorCount = 0
 
 	# 对测试集分类
@@ -174,6 +193,7 @@ if __name__ == '__main__':
 	print emailText
 	listOfTokens = regEx.split(emailText)
 	print listOfTokens
+	print '----------test demo start---------------'
 
 	spamTest()
 
