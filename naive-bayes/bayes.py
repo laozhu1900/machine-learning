@@ -75,9 +75,6 @@ def trainNB0(trainMatrix, trainCategory):
 
 def classifyNB(vec2Classify, p0Vect, p1Vect, pClass1):
 	# 元素相乘
-	print 111, vec2Classify
-	print 222, p1Vect
-	print 3333, vec2Classify * p1Vect
 	p1 = sum(vec2Classify * p1Vect) + log(pClass1)
 	p0 = sum(vec2Classify * p0Vect) + log(1.0 - pClass1)
 	if p1 > p0:
@@ -94,10 +91,9 @@ def testingNB():
 	p0V, p1V, pAb = trainNB0(array(trainMat), array(listClasses))
 	testEntry = ['love', 'my', 'dalmation']
 	thisDoc = array(setOfWords2Vec(myVocabList, testEntry))
-	print testEntry, 'classified as: ', classifyNB(thisDoc, p0V, p1V, pAb)
+
 	testEntry = ['stupid','garbage']
 	thisDoc = array(setOfWords2Vec(myVocabList, testEntry))
-	print testEntry, 'classified as: ', classifyNB(thisDoc, p0V, p1V, pAb)
 
 #  文件解析和完整的测试函数
 def textParse(bigString):
@@ -126,22 +122,13 @@ def spamTest():
 	# 随机构建训练集
 	for i in range(10):
 		randIndex = int(random.uniform(0, len(trainingSet)))
-		print randIndex
 		testSet.append(trainingSet[randIndex])
 		del(trainingSet[randIndex])
-	print testSet
-	print trainingSet
 	trainMat = []; trainClass = []
 	for docIndex in trainingSet:
 		trainMat.append(setOfWords2Vec(vocabList, docList[docIndex]))
-		print len(setOfWords2Vec(vocabList, docList[docIndex]))
 		trainClass.append(classList[docIndex])
 	p0V, p1V, pSpam = trainNB0(array(trainMat), array(trainClass))
-	print array(trainMat)
-	print array(trainClass)
-	print p0V
-	print p1V
-	print pSpam
 	errorCount = 0
 
 	# 对测试集分类
