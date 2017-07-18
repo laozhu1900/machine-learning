@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 from numpy import *
-
+from time import sleep
 
 def loadDataSet(fileName):
 	dataMat = []; labelMat = []
@@ -27,7 +27,7 @@ def clipAlpha(aj, H, L):
 
 """
 .T 矩阵转置
- import numpy as np, np.eye(n,m,k), n 是行，m是列,k是对角线的索引
+import numpy as np, np.eye(n,m,k), n 是行，m是列,k是对角线的索引
 """
 def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
     dataMatrix = mat(dataMatIn); labelMat = mat(classLabels).transpose()
@@ -75,6 +75,21 @@ def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
         else: iter = 0
         print "iteration number: %d" % iter
     return b,alphas
+
+
+
+def kernelTrans(X, A, kTup): #calc the kernel or transform data to a higher dimensional space
+    m,n = shape(X)
+    K = mat(zeros((m,1)))
+    if kTup[0]=='lin': K = X * A.T   #linear kernel
+    elif kTup[0]=='rbf':
+        for j in range(m):
+            deltaRow = X[j,:] - A
+            K[j] = deltaRow*deltaRow.T
+        K = exp(K/(-1*kTup[1]**2)) #divide in NumPy is element-wise not matrix like Matlab
+    else: raise NameError('Houston We Have a Problem -- \
+    That Kernel is not recognized')
+    return K
 
 """
 	选择第一个alpha值之后，算法通过内循环来选择第二个alpha
@@ -342,15 +357,22 @@ def smoPK(dataMatIn, classLabels, C, toler, maxIter):    #full Platt SMO
                 print "non-bound, iter: %d i:%d, pairs changed %d" % (iter,i,alphaPairsChanged)
             iter += 1
         if entireSet: entireSet = False #toggle entire set loop
-        elif (alphaPairsChanged == 0): entireSet = True  
+        elif (alphaPairsChanged == 0): entireSet = True
         print "iteration number: %d" % iter
     return oS.b,oS.alphas
 
 if __name__ == '__main__':
 	dataArr, labelArr = loadDataSet('testSet.txt')
-	print labelArr
-	print dataArr
-	b, alphas = smoSimple(dataArr, labelArr, 0.6, 0.001, 40)
+	# print labelArr
+	# print dataArr
+	# b, alphas = smoSimple(dataArr, labelArr, 0.6, 0.001, 40)
+	# print b
+	# print alphas
+	# print alphas[alphas>0]
+
+	b, alphas = smoP(dataArr, labelArr, 0.6, 0.001, 40)
 	print b
 	print alphas
 	print alphas[alphas>0]
+	testRbf(k1=1.3)
+	testDigits(('rbf', 20))
